@@ -7,6 +7,8 @@ width = 1000
 height = 700
 win = pygame.display.set_mode((width,height))
 pygame.display.set_caption('Snake')
+counterEaten = 0
+
 #snek
 #--------------------------------------------------------------- end
 
@@ -21,27 +23,29 @@ class Snake():
         
         self.vel = vel
         
+        self.xHead = x
+        self.yHead = y
+        self.widthHead = width
+        self.heightHead = height
+        self.change = 0 
         
-        
+    def makeHead(self,window):
+        self.headBlock = pygame.Rect(self.xHead,self.yHead,self.widthHead,self.heightHead)
+        pygame.draw.rect(window,(255,32,94),(self.headBlock))
 
     def makeBody(self):
         self.bodyBlock = pygame.Rect(self.xBody,self.yBody,self.widthBody,self.heightBody)
-        
-        
-    
-    def pushBody(self):
-        
+       
         self.bodyArray.append(self.bodyBlock)
-        #self.xBody += 20
-        
 
-        
-
+    
     def drawBody(self,window):
-        for x in self.bodyBlock:
-            pygame.draw.rect(window,(255,255,12),(x))
-
-
+        for block in self.bodyArray:
+            
+            pygame.draw.rect(window,(255,255,12),block)
+            print(len(self.bodyArray))
+           
+        
 
 class Food():
     def __init__(self,radius):
@@ -87,12 +91,17 @@ while run:
     
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
-        snakePlayer.xBody -= snakePlayer.vel        
+        snakePlayer.xHead -= snakePlayer.vel
+        snakePlayer.xBody -= snakePlayer.vel
+        print("hi?")        
     if keys[pygame.K_RIGHT]:
+        snakePlayer.xHead += snakePlayer.vel
         snakePlayer.xBody += snakePlayer.vel
     if keys[pygame.K_UP]:
+        snakePlayer.yHead -= snakePlayer.vel
         snakePlayer.yBody -= snakePlayer.vel
     if keys[pygame.K_DOWN]:
+        snakePlayer.yHead += snakePlayer.vel
         snakePlayer.yBody += snakePlayer.vel
     #if snakePlayer.x < snakePlayer.path [1]: 
     #else:
@@ -104,22 +113,23 @@ while run:
     
 
     snakeRect = pygame.Rect(snakePlayer.xBody,snakePlayer.yBody,snakePlayer.widthBody,snakePlayer.heightBody)
-
-    snakePlayer.makeBody()
-    snakePlayer.pushBody()
+    snakePlayer.makeHead(win)
+    #snakePlayer.makeBody(win)
+    if counterEaten > 0:
+        snakePlayer.drawBody(win)
       
     if eaten is True:
+        counterEaten += 1
         foodX, foodY = foodOrb.newPosition()
         snakePlayer.makeBody()
-        snakePlayer.pushBody()
-        snakePlayer.drawBody(win)
+    
         print("im at loop eaten")
  
     
     foodRect = pygame.Rect(foodX,foodY,5,5)
     
     foodOrb.draw(win,foodX,foodY)
-    snakePlayer.drawBody(win)
+    
 
     #Collision check
     eaten = pygame.Rect.colliderect(snakeRect, foodRect)
